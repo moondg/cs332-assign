@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.watcherExclude": {
+			"**/target": true
+		},
+		"files.trimTrailingWhitespace": true,
+		"files.trimFinalNewlines": true,
+		"editor.formatOnSave": true,
+		"editor.defaultFormatter": "scalameta.metals"
+	}
+}
