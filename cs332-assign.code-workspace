@@ -11,6 +11,7 @@
 		"files.trimTrailingWhitespace": true,
 		"files.trimFinalNewlines": true,
 		"editor.formatOnSave": true,
-		"editor.defaultFormatter": "scalameta.metals"
+		"editor.defaultFormatter": "scalameta.metals",
+		"editor.minimap.enabled": false
 	}
 }

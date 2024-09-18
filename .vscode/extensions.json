@@ -2,7 +2,7 @@
     "recommendations": [
         "scalameta.metals",
         "gruntfuggly.todo-tree",
-        "eamodio.gitlens",
-        "adam-bender.commit-message-editor"
+        "adam-bender.commit-message-editor",
+        "mhutchie.git-graph"
     ]
 }
