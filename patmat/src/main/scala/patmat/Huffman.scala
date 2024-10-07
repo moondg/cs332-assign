@@ -109,15 +109,9 @@ object Huffman {
    * If `trees` is a list of less than two elements, that list should be returned
    * unchanged.
    */
-  def combine(trees: List[CodeTree]): List[CodeTree] = singleton(trees) match {
-    case true => trees
-    case false => {
-      val treeFst = trees.head
-      val treeSnd = trees.tail.head
-      val others = trees.tail.tail
-      val mergedTrees = makeCodeTree(treeFst, treeSnd) :: others
-      mergedTrees.sortBy(weight(_))
-    }
+  def combine(trees: List[CodeTree]): List[CodeTree] = trees match {
+    case fst :: snd :: tail => (makeCodeTree(fst, snd) :: tail).sortBy(weight(_))
+    case others => others
   }
 
   /**
