@@ -102,6 +102,6 @@ trait Solver extends GameDef {
    */
   lazy val solution: List[Move] = pathsToGoal match {
     case Stream() => List()
-    case otherwise => otherwise.head._2
+    case otherwise => otherwise.head._2.reverse
   }
 }
