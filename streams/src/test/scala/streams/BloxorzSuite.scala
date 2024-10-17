@@ -99,6 +99,19 @@ class BloxorzSuite extends FunSuite {
     val optsolution = List(Right, Right, Right, Right, Up, Left, Down, Down, Down, Right, Right, Right, Down, Left, Up, Left, Left, Left, Up, Up, Right, Up, Right, Right, Down, Right, Up, Left, Left, Left, Down, Down, Left, Left, Left, Up, Up, Right, Up, Up, Left, Down, Right, Up, Right, Down, Left)
   }
 
+  trait LevelImpossible1 extends SolutionChecker {
+    val level =
+    """SoT""".stripMargin
+  }
+
+  trait LevelImpossible2 extends SolutionChecker {
+    val level =
+    """Sooo-
+      |ooo--
+      |oo---
+      |---oT""".stripMargin
+  }
+
   test("terrain function level 1") {
     new Level1 {
       assert(terrain(Pos(0,0)), "0,0")
@@ -217,6 +230,18 @@ class BloxorzSuite extends FunSuite {
   test("optimal solution length for level 11") {
     new Level11 {
       assert(solution.length == optsolution.length)
+    }
+  }
+
+  test("optimal solution for impossible level 1") {
+    new LevelImpossible1 {
+      assert(solution == List())
+    }
+  }
+
+  test("optimal solution for impossible level 2") {
+    new LevelImpossible1 {
+      assert(solution == List())
     }
   }
 }
