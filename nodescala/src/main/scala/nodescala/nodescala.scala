@@ -29,7 +29,12 @@ trait NodeScala {
    *  @param token        the cancellation token
    *  @param body         the response to write back
    */
-  private def respond(exchange: Exchange, token: CancellationToken, response: Response): Unit = ???
+  private def respond(exchange: Exchange, token: CancellationToken, response: Response): Unit = {
+    while (token.nonCancelled && response.hasNext) {
+      exchange.write(response.next)
+    }
+    exchange.close()
+  }
 
   /** A server:
    *  1) creates and starts an http listener
@@ -41,10 +46,22 @@ trait NodeScala {
    *  @param handler        a function mapping a request to a response
    *  @return               a subscription that can stop the server and all its asynchronous operations *entirely*
    */
-  def start(relativePath: String)(handler: Request => Response): Subscription = ???
+  def start(relativePath: String)(handler: Request => Response): Subscription = {
+    val listener = createListener(relativePath)
+    val listenerSubscription = listener.start()
+    val cancellationSource = CancellationTokenSource()
+    Future.run() { token =>
+      async {
+        while (token.nonCancelled) {
+          val (req, exchange) = await(listener.nextRequest())
+          respond(exchange, token, handler(req))
+        }
+        listenerSubscription.unsubscribe()
+      }
+    }
 
+  }
 }
-
 
 object NodeScala {
 
@@ -61,6 +78,7 @@ object NodeScala {
   /** Used to write the response to the request.
    */
   trait Exchange {
+
     /** Writes to the output stream of the exchange.
      */
     def write(s: String): Unit
@@ -126,7 +144,8 @@ object NodeScala {
   object Listener {
     class Default(val port: Int, val relativePath: String) extends Listener {
       private val s = HttpServer.create(new InetSocketAddress(port), 0)
-      private val executor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue)
+      private val executor =
+        new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue)
       s.setExecutor(executor)
 
       def start() = {
@@ -139,9 +158,11 @@ object NodeScala {
         }
       }
 
-      def createContext(handler: Exchange => Unit) = s.createContext(relativePath, new HttpHandler {
-        def handle(httpxchg: HttpExchange) = handler(Exchange(httpxchg))
-      })
+      def createContext(handler: Exchange => Unit) = s.createContext(
+        relativePath,
+        new HttpHandler {
+          def handle(httpxchg: HttpExchange) = handler(Exchange(httpxchg))
+        })
 
       def removeContext() = s.removeContext(relativePath)
     }
